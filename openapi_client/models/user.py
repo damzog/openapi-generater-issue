@@ -17,29 +17,26 @@ import pprint
 import re  # noqa: F401
 import json
 
-
+from pydantic import BaseModel, ConfigDict, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
-from pydantic import BaseModel, StrictStr
 from openapi_client.models.address import Address
-try:
-    from typing import Self
-except ImportError:
-    from typing_extensions import Self
+from typing import Optional, Set
+from typing_extensions import Self
 
 class User(BaseModel):
     """
     User
     """ # noqa: E501
     name: Optional[StrictStr] = None
-    address: Optional[Address] = None
-    relations: Optional[Any] = None
-    __properties: ClassVar[List[str]] = ["name", "address", "relations"]
+    age: Optional[StrictInt] = None
+    relations: Optional[Dict[str, Address]] = None
+    __properties: ClassVar[List[str]] = ["name", "age", "relations"]
 
-    model_config = {
-        "populate_by_name": True,
-        "validate_assignment": True,
-        "protected_namespaces": (),
-    }
+    model_config = ConfigDict(
+        populate_by_name=True,
+        validate_assignment=True,
+        protected_namespaces=(),
+    )
 
 
     def to_str(self) -> str:
@@ -52,7 +49,7 @@ class User(BaseModel):
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Self:
+    def from_json(cls, json_str: str) -> Optional[Self]:
         """Create an instance of User from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
@@ -66,24 +63,18 @@ class User(BaseModel):
           were set at model initialization. Other fields with value `None`
           are ignored.
         """
+        excluded_fields: Set[str] = set([
+        ])
+
         _dict = self.model_dump(
             by_alias=True,
-            exclude={
-            },
+            exclude=excluded_fields,
             exclude_none=True,
         )
-        # override the default output from pydantic by calling `to_dict()` of address
-        if self.address:
-            _dict['address'] = self.address.to_dict()
-        # set to None if relations (nullable) is None
-        # and model_fields_set contains the field
-        if self.relations is None and "relations" in self.model_fields_set:
-            _dict['relations'] = None
-
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Dict) -> Self:
+    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
         """Create an instance of User from a dict"""
         if obj is None:
             return None
@@ -93,7 +84,7 @@ class User(BaseModel):
 
         _obj = cls.model_validate({
             "name": obj.get("name"),
-            "address": Address.from_dict(obj.get("address")) if obj.get("address") is not None else None,
+            "age": obj.get("age"),
         })
         return _obj
 

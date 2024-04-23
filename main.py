@@ -13,7 +13,7 @@ class Address(BaseModel):
 
 class User(BaseModel):
     name: str = None
-    address: Address = None
+    age: int = None
     relations: Dict[str, Address] = None
 
 
