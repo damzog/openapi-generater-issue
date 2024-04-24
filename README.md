@@ -50,7 +50,7 @@ results in
  /home/dzj8fe/ws/fastapi-test/.venv/bin/python /home/dzj8fe/ws/fastapi-test/client.py 
 The response of DefaultApi->root_get:
 
-'{"name":"John"}'
+'{"name":"John", "age": 25}'
 
 Process finished with exit code 0  
 ```
@@ -62,7 +62,14 @@ The reason is probably the "not" in the the generated deserilization code:
         """Create an instance of User from a dict"""
         if obj is None:
             return None
-        # Should probably be if isinstance(obj, dict)
+        # Why don't we just let handle pydantic the deserialization? The generated code completely ignores the relations 
+        # attribute.
+        # 
+        # This code works for me
+        #  _obj = cls.model_validate(obj)
+        # return _obj
+        # 
+        # The generated code below does not
         if not isinstance(obj, dict):
             return cls.model_validate(obj)
 
