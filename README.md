@@ -13,22 +13,19 @@ class User(BaseModel):
 Translates into following schema using fastapi openapi json schema generator:
 
 ```json
-"User": {
+      "User": {
         "properties": {
           "name": {
             "type": "string",
             "title": "Name"
           },
-          "address": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Address"
-              }
-            ]
+          "age": {
+            "type": "integer",
+            "title": "Age"
           },
           "relations": {
             "additionalProperties": {
-              "type": "string"
+              "$ref": "#/components/schemas/Address"
             },
             "type": "object",
             "title": "Relations"
